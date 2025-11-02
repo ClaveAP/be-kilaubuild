@@ -21,7 +21,7 @@ class FaqController extends Controller
     }
 
     public function showEditScreen(Faq $faq){
-        if (auth()->user()->id == $faq['user_id']){
+        if (auth()->id() == $faq['user_id']){
             return view('edit-faq', ['faq' => $faq]);
         }
         
@@ -29,7 +29,7 @@ class FaqController extends Controller
     }
 
     public function updateFAQ(Faq $faq, Request $request){
-        if (auth()->user()->id == $faq['user_id']){
+        if (auth()->id() == $faq['user_id']){
             $incomingFields = $request->validate([
                 'question' => 'required',
                 'answer' => 'required'
@@ -47,11 +47,13 @@ class FaqController extends Controller
     }
 
     public function deleteFAQ(Faq $faq){
-       if (auth()->user()->id == $faq['user_id']){
+       if (auth()->user()->id() == $faq['user_id']){
             $faq->delete();
+
+            return redirect('/dashboard');
         }
         
-        return redirect('/dashboard');
+        return redirect('/');
     }
 
     

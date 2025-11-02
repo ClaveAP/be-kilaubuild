@@ -3,11 +3,15 @@
 use App\Http\Controllers\DesainInteriorController;
 use App\Http\Controllers\OngoingProjectController;
 use App\Http\Controllers\ProjectDoneController;
+use App\Http\Controllers\StatisticController;
+use App\Http\Controllers\TestimonyController;
 use App\Models\desainInterior;
 use App\Models\Faq;
 use App\Models\InstagramPost;
 use App\Models\ongoingProjects;
 use App\Models\projectDone;
+use App\Models\statistic;
+use App\Models\testimony;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\AdminController;
@@ -21,16 +25,20 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     $posts = InstagramPost::latest()->get();
     $faqs = Faq::latest()->get();
+    $tstmns = testimony::latest()->get();
     $PDs = projectDone::latest()->get();
     $OPs = ongoingProjects::latest()->get();
-    $DIs= desainInterior::latest()->get();
+    $DIs = desainInterior::latest()->get();
+    $statis = statistic::all();
     
     return view('dashboard', [
         'posts' => $posts,
         'faqs' => $faqs,
+        'tstmns' => $tstmns,
         'PDs' => $PDs,
         'OPs' => $OPs,
-        'DIs' => $DIs
+        'DIs' => $DIs,
+        'statis' => $statis
     ]);
 });
 
@@ -45,11 +53,23 @@ Route::get('/edit-post/{post}', [InstagramPostController::class, 'showEditScreen
 Route::put('/edit-post/{post}', [InstagramPostController::class, 'updatePost']);
 Route::delete('/delete-post/{post}', [InstagramPostController::class, 'deletePost']);
 
+// Statistic
+Route::post('/create-statistic', [StatisticController::class, 'createStatistic']);
+Route::get('/edit-statistic/{statis}', [StatisticController::class, 'showEditScreen']);
+Route::put('/edit-statistic/{statis}', [StatisticController::class, 'updateStatistic']);
+Route::delete('/delete-statistic/{statis}', [StatisticController::class, 'deleteStatistic']);
+
 // FAQ
 Route::post('/create-faq', [FaqController::class, 'createFAQ']);
 Route::get('/edit-faq/{faq}', [FaqController::class, 'showEditScreen']);
 Route::put('/edit-faq/{faq}', [FaqController::class, 'updateFAQ']);
 Route::delete('/delete-faq/{faq}', [FaqController::class, 'deleteFAQ']);
+
+// Testimonys
+Route::post('/create-testimony', [TestimonyController::class, 'createTstmn']);
+Route::get('/edit-testimony/{tstmn}', [TestimonyController::class, 'showEditScreen']);
+Route::put('/edit-testimony/{tstmn}', [TestimonyController::class, 'updateTstmn']);
+Route::delete('/delete-testimony/{tstmn}', [TestimonyController::class, 'deleteTstmn']);
 
 // Ongoing Project
 Route::post('/create-ongoing-project', [OngoingProjectController::class, 'createOP']);

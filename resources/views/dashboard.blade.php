@@ -65,6 +65,29 @@
             <button>Create FAQ</button>
         </form>
     </div>
+
+    <div style="border: 3px solid black; margin-bottom: 10px;">
+        <h2>Create Testimony</h2>
+        <form action="/create-testimony" method="POST">
+            @csrf
+            <input name="name" type="text" placeholder="Nama Klien...">
+            <textarea name="review" type="text" placeholder="Isi testimoni..."></textarea>
+            <input name="star" type="number" placeholder="Bintang..." max="5" min="1">
+            <button>Create Testimony</button>
+        </form>
+    </div>
+
+    <div style="border: 3px solid black; margin-bottom: 10px;">
+        <h2>Create Statistic</h2>
+        <form action="/create-statistic" method="POST">
+            @csrf
+            <input name="tahunPengalaman" type="number" placeholder="Tahun Pengalaman...">
+            <input name="proyekSelesai" type="number" placeholder="Jumlah Proyek Selesai..."></input>
+            <input name="klienPuas" type="number" placeholder="Jumlah Klien Puas...">
+            <input name="sebaranKota" type="number" placeholder="Sebaran Kota..."></input>
+            <button>Create Statistic</button>
+        </form>
+    </div>
     
     @if(isset($posts) && $posts->count() > 0)
     <div style="border: 3px solid black; margin-bottom: 10px;">
@@ -185,6 +208,53 @@
         <p>No FAQs available</p>
     </div>
     @endif
+
+    @if(isset($tstmns) && $tstmns->count() > 0)
+    <div style="border: 3px solid black; margin-bottom: 10px;">
+        <h2>Testimoni</h2>
+        @foreach ($tstmns as $tstmn)
+        <div style="background-color: gray; padding: 10px; margin: 10px;">
+            <h3>{{$tstmn['name']}}</h3>
+            {{$tstmn['review']}}
+            Star: {{$tstmn['star']}}
+        </div>
+        <p><a href="/edit-testimony/{{$tstmn->id}}">Edit</a></p>
+        <form action="/delete-testimony/{{$tstmn->id}}" method="POST">
+            @csrf
+            @method('DELETE')
+            <button>Delete</button>
+        </form>
+        @endforeach
+    </div>
+    @else
+    <div style="border: 3px solid black; margin-bottom: 10px;">
+        <h2>Testimoni</h2>
+        <p>No Testimony available</p>
+    </div>
+    @endif
+
+    {{-- @if(isset($statis) && $statis->count() > 0) --}}
+    <div style="border: 3px solid black; margin-bottom: 10px;">
+        <h2>Statistic</h2>
+        <div style="background-color: gray; padding: 10px; margin: 10px;">
+            {{ $statis->first()->tahun_pengalaman }}
+            {{ $statis->first()->proyek_selesai }}
+            {{ $statis->first()->klien_puas }}
+            {{ $statis->first()->sebaran_kota }}
+        </div>
+        <p><a href="/edit-statistic/{{$statis->first()->id}}">Edit</a></p>
+        <form action="/delete-statistic/{{$statis->first()->id}}" method="POST">
+            @csrf
+            @method('DELETE')
+            <button>Delete</button>
+        </form>
+    </div>
+    {{-- @else
+    <div style="border: 3px solid black; margin-bottom: 10px;">
+        <h2>Statistic</h2>
+        <p>No Statistic available</p>
+    </div>
+    @endif --}}
     
     @else
     {{-- <div style="border: 3px solid black; margin-bottom: 10px;">

@@ -65,4 +65,12 @@ class User extends Authenticatable
     public function adminDI() {
         $this->hasMany(desainInterior::class, 'user_id');
     }
+
+    public function adminTstmn() {
+        $this->hasMany(testimony::class, 'user_id');
+    }
+
+    public function adminStatistic() {
+        $this->hasMany(statistic::class, 'user_id');
+    }
 }
