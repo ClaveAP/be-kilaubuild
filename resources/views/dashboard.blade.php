@@ -23,6 +23,17 @@
     </div>
 
     <div style="border: 3px solid black; margin-bottom: 10px;">
+        <h2>Create Service</h2>
+        <form action="/create-service" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input name="name" type="text" placeholder="Nama Layanan...">
+            <textarea name="desc" type="text" placeholder="Deskripsi Layanan..."></textarea>
+            <input type="file" name="image">
+            <button>Create Service</button>
+        </form>
+    </div>
+
+    <div style="border: 3px solid black; margin-bottom: 10px;">
         <h2>Create Ongoing Project</h2>
         <form action="/create-ongoing-project" method="POST" enctype="multipart/form-data">
             @csrf
@@ -81,11 +92,29 @@
         <h2>Create Statistic</h2>
         <form action="/create-statistic" method="POST">
             @csrf
-            <input name="tahunPengalaman" type="number" placeholder="Tahun Pengalaman...">
-            <input name="proyekSelesai" type="number" placeholder="Jumlah Proyek Selesai..."></input>
-            <input name="klienPuas" type="number" placeholder="Jumlah Klien Puas...">
-            <input name="sebaranKota" type="number" placeholder="Sebaran Kota..."></input>
+            <input name="tahun_pengalaman" type="number" placeholder="Tahun Pengalaman...">
+            <input name="proyek_selesai" type="number" placeholder="Jumlah Proyek Selesai..."></input>
+            <input name="klien_puas" type="number" placeholder="Jumlah Klien Puas...">
+            <input name="sebaran_kota" type="number" placeholder="Sebaran Kota..."></input>
             <button>Create Statistic</button>
+        </form>
+    </div>
+
+    <div style="border: 3px solid black; margin-bottom: 10px;">
+        <h2>Create Contact</h2>
+        <form action="/create-contact" method="POST">
+            @csrf
+            <input name="no_telp" type="text" placeholder="No Telepon...">
+            <input name="alamat" type="text" placeholder="Alamat..."></input>
+            <input name="link_gmaps" type="text" placeholder="Link Google Maps...">
+            <input name="email" type="email" placeholder="Email..."></input>
+            <input name="url_instagram" type="text" placeholder="Link Instagram..."></input>
+            <input name="url_facebook" type="text" placeholder="Link Facebook..."></input>
+            <input name="url_threads" type="text" placeholder="Link Threads..."></input>
+            <input name="url_tiktok" type="text" placeholder="Link Tiktok..."></input>
+            <input name="url_youtube" type="text" placeholder="Link Youtube..."></input>
+            <input name="url_twitter" type="text" placeholder="Link Twiiter..."></input>
+            <button>Create Contact</button>
         </form>
     </div>
     
@@ -110,6 +139,30 @@
     <div style="border: 3px solid black; margin-bottom: 10px;">
         <h2>Posts</h2>
         <p>No posts available</p>
+    </div>
+    @endif
+
+    @if(isset($srvcs) && $srvcs->count() > 0)
+    <div style="border: 3px solid black; margin-bottom: 10px;">
+        <h2>Services</h2>
+        @foreach ($srvcs as $srvc)
+        <div style="background-color: gray; padding: 10px; margin: 10px;">
+            <h3>{{$srvc['name']}}</h3>
+            <img src="{{ asset('storage/' . $srvc->image) }}" alt="{{$srvc['name']}}" style="max-width: 200px;">
+            {{$srvc['desc']}}
+        </div>
+        <p><a href="/edit-service/{{$srvc->id}}">Edit</a></p>
+        <form action="/delete-service/{{$srvc->id}}" method="POST">
+            @csrf
+            @method('DELETE')
+            <button>Delete</button>
+        </form>
+        @endforeach
+    </div>
+    @else
+    <div style="border: 3px solid black; margin-bottom: 10px;">
+        <h2>Services</h2>
+        <p>No Services available</p>
     </div>
     @endif
 
@@ -233,7 +286,7 @@
     </div>
     @endif
 
-    {{-- @if(isset($statis) && $statis->count() > 0) --}}
+    @if(isset($statis) && $statis->count() > 0)
     <div style="border: 3px solid black; margin-bottom: 10px;">
         <h2>Statistic</h2>
         <div style="background-color: gray; padding: 10px; margin: 10px;">
@@ -249,12 +302,12 @@
             <button>Delete</button>
         </form>
     </div>
-    {{-- @else
+    @else
     <div style="border: 3px solid black; margin-bottom: 10px;">
         <h2>Statistic</h2>
         <p>No Statistic available</p>
     </div>
-    @endif --}}
+    @endif
     
     @else
     {{-- <div style="border: 3px solid black; margin-bottom: 10px;">

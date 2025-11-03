@@ -50,6 +50,10 @@ class User extends Authenticatable
         $this->hasMany(InstagramPost::class, 'user_id');
     }
 
+    public function adminServices() {
+        $this->hasMany(service::class, 'user_id');
+    }
+
     public function adminFaqs() {
         $this->hasMany(Faq::class, 'user_id');
     }
@@ -72,5 +76,9 @@ class User extends Authenticatable
 
     public function adminStatistic() {
         $this->hasMany(statistic::class, 'user_id');
+    }
+
+    public function adminContact() {
+        $this->hasMany(contact::class, 'user_id');
     }
 }

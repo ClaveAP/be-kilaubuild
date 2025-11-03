@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DesainInteriorController;
 use App\Http\Controllers\OngoingProjectController;
 use App\Http\Controllers\ProjectDoneController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\TestimonyController;
 use App\Models\desainInterior;
@@ -10,6 +12,7 @@ use App\Models\Faq;
 use App\Models\InstagramPost;
 use App\Models\ongoingProjects;
 use App\Models\projectDone;
+use App\Models\service;
 use App\Models\statistic;
 use App\Models\testimony;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +27,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     $posts = InstagramPost::latest()->get();
+    $srvcs = service::latest()->get();
     $faqs = Faq::latest()->get();
     $tstmns = testimony::latest()->get();
     $PDs = projectDone::latest()->get();
@@ -33,6 +37,7 @@ Route::get('/dashboard', function () {
     
     return view('dashboard', [
         'posts' => $posts,
+        'srvcs' => $srvcs,
         'faqs' => $faqs,
         'tstmns' => $tstmns,
         'PDs' => $PDs,
@@ -52,6 +57,12 @@ Route::post('/create-post', [InstagramPostController::class, 'createPost']);
 Route::get('/edit-post/{post}', [InstagramPostController::class, 'showEditScreen']);
 Route::put('/edit-post/{post}', [InstagramPostController::class, 'updatePost']);
 Route::delete('/delete-post/{post}', [InstagramPostController::class, 'deletePost']);
+
+// Services
+Route::post('/create-service', [ServiceController::class, 'createService']);
+Route::get('/edit-service/{srvc}', [ServiceController::class, 'showEditScreen']);
+Route::put('/edit-service/{srvc}', [ServiceController::class, 'updateService']);
+Route::delete('/delete-service/{srvc}', [ServiceController::class, 'deleteService']);
 
 // Statistic
 Route::post('/create-statistic', [StatisticController::class, 'createStatistic']);
@@ -88,3 +99,9 @@ Route::post('/create-desain-interior', [DesainInteriorController::class, 'create
 Route::get('/edit-desain-interior/{DI}', [DesainInteriorController::class, 'showEditScreen']);
 Route::put('/edit-desain-interior/{DI}', [DesainInteriorController::class, 'updateDI']);
 Route::delete('/delete-desain-interior/{DI}', [DesainInteriorController::class, 'deleteDI']);
+
+// Contact
+Route::post('/create-contact', [ContactController::class, 'createContact']);
+Route::get('/edit-contact/{cont}', [ContactController::class, 'showEditScreen']);
+Route::put('/edit-contact/{cont}', [ContactController::class, 'updateContact']);
+Route::delete('/delete-contact/{cont}', [ContactController::class, 'deleteContact']);
