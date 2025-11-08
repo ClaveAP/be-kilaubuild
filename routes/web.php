@@ -3,6 +3,7 @@
 use App\Http\Controllers\BenefitController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DesainInteriorController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\OngoingProjectController;
 use App\Http\Controllers\OwnerProfileController;
 use App\Http\Controllers\ProjectDoneController;
@@ -66,6 +67,7 @@ Route::POST('/register', [AdminController::class,'register']);
 Route::POST('/login', [AdminController::class, 'login']);
 Route::POST('/logout', [AdminController::class, 'logout']);
 Route::POST('/dashboard', [AdminController::class, 'redirectDashboard']);
+Route::POST('/send-feedback', [FeedbackController::class, 'sendFeedback']);
 
 // Instagram Posts
 Route::post('/create-post', [InstagramPostController::class, 'createPost']);

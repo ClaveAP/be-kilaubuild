@@ -158,7 +158,7 @@
         @foreach ($posts as $post)
         <div style="background-color: gray; padding: 10px; margin: 10px;">
             <a href="{{$post['instagram_url']}}">
-                <h3>{{$post['title']}} by {{$post->searchAuthor->name}}</h3>
+                <h3>{{$post['title']}}</h3>
                 <img src="{{ asset('storage/' . $post->image) }}" alt="{{$post['title']}}" style="max-width: 200px;">
             </a>
         </div>
