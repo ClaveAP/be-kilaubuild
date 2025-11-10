@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const message = `Saya ingin survei ditanggal ${formattedDate}`;
             
             // Nomor WhatsApp tujuan
-            fetch('/api/contact/phone')
+            fetch('/contact/phone')
                 .then(response => response.json())
                 .then(data => {
                     const phoneNumber = data.no_telp;

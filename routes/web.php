@@ -37,6 +37,10 @@ Route::get('/', function () {
 Route::get('/calendar/events', [CalendarController::class, 'getEvents'])->name('calendar.events');
 Route::get('/calendar/event-details', [CalendarController::class, 'getEventDetails'])->name('calendar.event-details');
 Route::get('/contact', [CalendarController::class, 'index']);
+Route::get('/contact/phone', function () {
+    $contact = contact::first(); // Ambil baris pertama (atau sesuaikan query)
+    return response()->json(['no_telp' => $contact->no_telp]);
+});
 
 Route::get('/dashboard', function () {
     $posts = InstagramPost::latest()->get();
