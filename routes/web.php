@@ -1,37 +1,42 @@
 <?php
 
-use App\Http\Controllers\BenefitController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\DesainInteriorController;
-use App\Http\Controllers\FeedbackController;
-use App\Http\Controllers\OngoingProjectController;
-use App\Http\Controllers\OwnerProfileController;
-use App\Http\Controllers\ProjectDoneController;
-use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\StatisticController;
-use App\Http\Controllers\TestimonyController;
-use App\Http\Controllers\VisiMisiController;
+use App\Models\Faq;
 use App\Models\benefit;
 use App\Models\contact;
-use App\Models\desainInterior;
-use App\Models\Faq;
-use App\Models\InstagramPost;
-use App\Models\ongoingProjects;
-use App\Models\ownerProfile;
-use App\Models\projectDone;
 use App\Models\service;
 use App\Models\statistic;
 use App\Models\testimony;
+use App\Models\projectDone;
+use App\Models\ownerProfile;
+use App\Models\InstagramPost;
 use App\Models\visionMission;
+use App\Models\desainInterior;
+use App\Models\ongoingProjects;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\BenefitController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\VisiMisiController;
+use App\Http\Controllers\StatisticController;
+use App\Http\Controllers\TestimonyController;
+use App\Http\Controllers\ProjectDoneController;
+use App\Http\Controllers\OwnerProfileController;
 use App\Http\Controllers\InstagramPostController;
+use App\Http\Controllers\DesainInteriorController;
+use App\Http\Controllers\OngoingProjectController;
 
 Route::get('/', function () {
     $posts = InstagramPost::all();
     return view('home', ['posts' => $posts]);
 });
+
+Route::get('/calendar/events', [CalendarController::class, 'getEvents'])->name('calendar.events');
+Route::get('/calendar/event-details', [CalendarController::class, 'getEventDetails'])->name('calendar.event-details');
+Route::get('/contact', [CalendarController::class, 'index']);
 
 Route::get('/dashboard', function () {
     $posts = InstagramPost::latest()->get();

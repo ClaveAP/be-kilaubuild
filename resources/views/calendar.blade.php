@@ -1,9 +1,10 @@
-<html>
+<!DOCTYPE html>
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
+    <title>Google Calendar Free/Busy Viewer</title>
+    
     <!-- FullCalendar CSS -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
     
@@ -215,11 +216,6 @@
     </style>
 </head>
 <body>
-    <form action="/dashboard" method="POST">
-        @csrf
-        <button>Dashboard</button>
-    </form>
-
     <div class="calendar-container">
         <div class="calendar-header">
             <div class="calendar-title">📅 Kalender - Status Sibuk/Tersedia</div>
@@ -245,7 +241,18 @@
         <div class="calendar-layout">
             <!-- Kolom kiri: Kalender -->
             <div class="calendar-section">
-                <div id="clientCalendar"></div>
+                <div id="calendar"></div>
+            </div>
+            
+            <!-- Kolom kanan: Tabel Jadwal -->
+            <div class="schedule-section">
+                <div class="schedule-header">
+                    <div class="schedule-title">Jadwal Harian</div>
+                    <div class="selected-date" id="selectedDate">Pilih tanggal di kalender</div>
+                </div>
+                <div id="scheduleContent">
+                    <p class="no-events">Silakan pilih tanggal di kalender untuk melihat jadwal.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -255,39 +262,6 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/id.js"></script>
     
     <!-- File JavaScript terpisah -->
-    <script src="{{ asset('js/clientCalendar.js') }}"></script>
-    
-
-    <div style="border: 3px solid black; margin-bottom: 10px;">
-        <h2>Kritik dan Saran</h2>
-        <form action="/send-feedback" method="POST">
-            @csrf
-            <input name="name" type="text" placeholder="Nama...">
-            <input name="email" type="email" placeholder="Email...">
-            <input name="no_telp" type="text" placeholder="Nomor HP...">
-            <textarea name="feedback" type="text" placeholder="Kritik atau Saran..."></textarea>
-            <button>Send</button>
-        </form>
-    </div>
-
-    @if(isset($posts) && $posts->count() > 0)
-    <div style="border: 3px solid black; margin-bottom: 10px;">
-        <h2>Posts</h2>
-        @foreach ($posts as $post)
-        <div style="background-color: gray; padding: 10px; margin: 10px;">
-            <a href="{{$post['instagram_url']}}">
-                <h3>{{$post['title']}}</h3>
-                <img src="{{ asset('storage/' . $post->image) }}" alt="{{$post['title']}}" style="max-width: 200px;">
-            </a>
-        </div>
-        @endforeach
-    </div>
-    @else
-    <div style="border: 3px solid black; margin-bottom: 10px;">
-        <h2>Posts</h2>
-        <p>No posts available</p>
-    </div>
-    @endif
-    
+    <script src="{{ asset('js/calendar.js') }}"></script>
 </body>
 </html>
