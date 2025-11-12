@@ -1,8 +1,6 @@
 // public/js/calendar.js
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('clientCalendar');
-    var scheduleContent = document.getElementById('scheduleContent');
-    var selectedDateEl = document.getElementById('selectedDate');
     
     // Inisialisasi FullCalendar
     var clientCalendar = new FullCalendar.Calendar(calendarEl, {
@@ -30,31 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     console.log('✅ Busy slots loaded:', data.length, 'slots');
-                    
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    
-                    // MODIFIKASI: Filter hanya event di tanggal mendatang
-                    const futureEvents = data.filter(event => {
-                        const eventStart = new Date(event.start);
-                        return eventStart >= today;
-                    });
-                    
-                    // Ubah semua event menjadi "SIBUK" tanpa detail
-                    const busyEvents = futureEvents.map(event => ({
-                        id: event.id,
-                        title: '🟥 SIBUK',
-                        start: event.start,
-                        end: event.end,
-                        allDay: event.allDay,
-                        color: '#ff4444',
-                        textColor: '#ffffff',
-                        borderColor: '#cc0000',
-                        // Hapus extendedProps agar tidak ada detail yang terbaca
-                        extendedProps: {}
-                    }));
-                    
-                    successCallback(busyEvents);
+                    successCallback(data);
                 })
                 .catch(error => {
                     console.error('❌ Error:', error);
@@ -70,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
         dateClick: function(info) {
             const clickedDate = new Date(info.dateStr + 'T00:00:00');
             const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0); // Reset waktu ke 00:00:00 untuk perbandingan yang akurat
             
             // 1. Cek apakah tanggal yang diklik adalah hari ini atau kemarin
             if (clickedDate <= today) {
@@ -78,23 +52,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // 2. Cek apakah tanggal tersebut memiliki event sibuk
+            // 2. Cek apakah tanggal tersebut memiliki event apapun (tidak peduli free/busy)
             const clickedDateStr = clickedDate.toISOString().split('T')[0];
-            const hasBusyEvent = clientCalendar.getEvents().some(event => {
+            const hasEvent = clientCalendar.getEvents().some(event => {
                 const eventStart = new Date(event.start);
-                eventStart.setDate(eventStart.getDate() - 1);
+                eventStart.setDate(eventStart.getDate() - 1); // bila tidak di -1 maka tanggal yang besok dari tanggal dengan jadwal yang tidak bisa di klik
                 const eventStartStr = eventStart.toISOString().split('T')[0];
                 return eventStartStr === clickedDateStr;
             });
             
-            if (hasBusyEvent) {
-                alert('Maaf, tanggal tersebut sudah ditandai sibuk. Silakan pilih tanggal lain.');
+            if (hasEvent) {
+                alert('Maaf, tanggal tersebut sudah memiliki jadwal. Silakan pilih tanggal lain.');
                 return;
             }
             
             // 3. Jika lolos kedua pengecekan, buka WhatsApp
             const options = { 
-                weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 
                 day: 'numeric' 
@@ -104,7 +77,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Template pesan WhatsApp
             const message = `Saya ingin survei ditanggal ${formattedDate}`;
             
-            // Nomor WhatsApp tujuan
             fetch('/contact/phone')
                 .then(response => response.json())
                 .then(data => {
@@ -135,23 +107,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 info.el.style.backgroundColor = '#f5f5f5';
                 info.el.style.cursor = 'not-allowed';
                 info.el.style.opacity = '0.6';
+                info.el.style.pointerEvents = 'none'; // Tambahkan ini untuk benar-benar menonaktifkan klik
+                return; // Langsung return karena tanggal sudah lewat
             }
             
-            // Cek jika tanggal memiliki event sibuk (hanya untuk tanggal mendatang)
-            if (cellDate > today) {
-                const dateStr = cellDate.toISOString().split('T')[0];
-                const hasBusyEvent = clientCalendar.getEvents().some(event => {
-                    const eventStart = new Date(event.start);
-                    eventStart.setDate(eventStart.getDate() - 1);
-                    const eventStartStr = eventStart.toISOString().split('T')[0];
-                    return eventStartStr === dateStr;
-                });
-                
-                if (hasBusyEvent) {
-                    info.el.style.backgroundColor = '#fff5f5';
-                    info.el.style.cursor = 'not-allowed';
-                    info.el.style.opacity = '0.7';
-                }
+            // Cek jika tanggal memiliki event apapun (tidak peduli free/busy)
+            const dateStr = cellDate.toISOString().split('T')[0];
+            const hasEvent = clientCalendar.getEvents().some(event => {
+                const eventStart = new Date(event.start);
+                eventStart.setDate(eventStart.getDate() - 1);
+                const eventStartStr = eventStart.toISOString().split('T')[0];
+                return eventStartStr === dateStr;
+            });
+            
+            if (hasEvent) {
+                info.el.style.backgroundColor = '#fff5f5';
+                info.el.style.cursor = 'not-allowed';
+                info.el.style.opacity = '0.7';
+                info.el.style.pointerEvents = 'none'; // Tambahkan ini untuk benar-benar menonaktifkan klik
+            }
+        },
+        
+        // Tambahkan event render untuk menangani selektor yang lebih spesifik
+        eventDidMount: function(info) {
+            const eventDate = new Date(info.event.start);
+            const dateStr = eventDate.toISOString().split('T')[0];
+            const dateCell = document.querySelector(`[data-date="${dateStr}"]`);
+            
+            if (dateCell) {
+                dateCell.style.pointerEvents = 'none';
+                dateCell.style.cursor = 'not-allowed';
             }
         },
         
@@ -189,44 +174,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Render calendar
     clientCalendar.render();
-    
-    // Fungsi sederhana untuk menampilkan status tanggal
-    function loadScheduleForDate(dateStr) {
-        const clickedDate = new Date(dateStr + 'T00:00:00');
-        const options = { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        };
-        selectedDateEl.textContent = clickedDate.toLocaleDateString('id-ID', options);
-        
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        // Cek jika tanggal sudah lewat
-        if (clickedDate <= today) {
-            scheduleContent.innerHTML = '<p class="past-day">Tanggal ini sudah lewat</p>';
-            return;
-        }
-        
-        // Cek apakah tanggal memiliki event
-        const dateStrFormatted = clickedDate.toISOString().split('T')[0];
-        const hasBusyEvent = clientCalendar.getEvents().some(event => {
-            const eventStart = new Date(event.start);
-            const eventStartStr = eventStart.toISOString().split('T')[0];
-            return eventStartStr === dateStrFormatted;
-        });
-        
-        if (hasBusyEvent) {
-            scheduleContent.innerHTML = '<p class="busy-day">Tanggal ini sudah penuh (SIBUK)</p>';
-        } else {
-            scheduleContent.innerHTML = '<p class="available-day">Tanggal ini tersedia untuk survei</p>';
-        }
-    }
-    
-    // Memuat info untuk hari ini secara default
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
-    loadScheduleForDate(todayStr);
 });

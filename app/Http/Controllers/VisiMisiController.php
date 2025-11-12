@@ -51,7 +51,7 @@ class VisiMisiController extends Controller
         return redirect('/');
     }
 
-    public function deleteFAQ(visionMission $VM){
+    public function deleteVisiMisi(visionMission $VM){
        if (auth()->id() == $VM['user_id']){
             $VM->delete();
 

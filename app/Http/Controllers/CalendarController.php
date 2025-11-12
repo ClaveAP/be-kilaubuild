@@ -21,7 +21,7 @@ class CalendarController extends Controller{
     }
 
 
-    public function getEvents(Request $request)
+     public function getEvents(Request $request)
     {
         \Log::info('=== CALENDAR EVENTS REQUEST START ===');
         \Log::info('Request params:', $request->all());
@@ -30,72 +30,68 @@ class CalendarController extends Controller{
             $request->validate([
                 'start' => 'required|date',
                 'end' => 'required|date',
-        ]);
+            ]);
 
             $start = Carbon::parse($request->start);
             $end = Carbon::parse($request->end);
 
-            // Batasi range
+            // Batasi range maksimal 31 hari
             $dateRangeInDays = $start->diffInDays($end);
-            if ($dateRangeInDays > 30) {
+            if ($dateRangeInDays > 31) {
                 $end = $start->copy()->addDays(31);
             }
 
             $calendarId = 'aa81d34788905de369f3fa9ecf55d216fdf18ddd069e868b4372ebeb359d2858@group.calendar.google.com';
 
-            $timeMin = $start->toIso8601String();
-            $timeMax = $end->toIso8601String();
-
-            // UBAH: Gunakan events list bukan freebusy untuk mengecek ada/tidaknya event
+            // Ambil events langsung dari Google Calendar
             $service = new \Google\Service\Calendar($this->calendarService->getClient());
         
-            $optParams = array(
-                'timeMin' => $timeMin,
-                'timeMax' => $timeMax,
+            $optParams = [
+                'timeMin' => $start->toIso8601String(),
+                'timeMax' => $end->toIso8601String(),
                 'singleEvents' => true,
                 'orderBy' => 'startTime',
-            );
+            ];
 
             $results = $service->events->listEvents($calendarId, $optParams);
             $events = $results->getItems();
 
-            // UBAH: Kelompokkan events per hari
-            $busyDays = [];
+            // Format events untuk FullCalendar
+            $formattedEvents = [];
             
             foreach ($events as $event) {
-                $eventStart = $event->getStart()->dateTime;
-                if (!$eventStart) {
-                    $eventStart = $event->getStart()->date; // All-day events
-                }
+                $eventStart = $event->getStart()->dateTime ?: $event->getStart()->date;
+                $eventEnd = $event->getEnd()->dateTime ?: $event->getEnd()->date;
                 
-                $eventDate = Carbon::parse($eventStart)->format('Y-m-d');
-                $busyDays[$eventDate] = true;
-            }
+                // Tentukan apakah event all-day
+                $isAllDay = !$event->getStart()->dateTime;
 
-            // UBAH: Buat event busy untuk setiap hari yang memiliki event
-            $formattedEvents = [];
-            foreach ($busyDays as $date => $isBusy) {
                 $formattedEvents[] = [
-                    'id' => 'busy-' . $date,
-                    'title' => '🟥 SIBUK',
-                    'start' => $date, // Tanggal saja (all-day event)
-                    'allDay' => true, // Tandai sebagai all-day event
+                    'id' => $event->getId(),
+                    'title' => $event->getSummary() ?: '🟥 SIBUK',
+                    'start' => $eventStart,
+                    'end' => $eventEnd,
+                    'allDay' => $isAllDay,
                     'color' => '#ff4444',
                     'textColor' => '#ffffff',
                     'borderColor' => '#cc0000',
+                    'extendedProps' => [
+                        'description' => $event->getDescription(),
+                        'location' => $event->getLocation(),
+                    ]
                 ];
             }
 
-            \Log::info('Returning busy days', [
-                'busy_days_count' => count($busyDays),
-                'total_events_found' => count($events)
+            \Log::info('Returning events', [
+                'events_count' => count($formattedEvents)
             ]);
             
             return response()->json($formattedEvents);
 
         } catch (\Exception $e) {
             \Log::error('Calendar Events Error', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
         
             return response()->json([
