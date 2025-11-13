@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use App\Models\contact;
+use Google\Service\Calendar;
 use Illuminate\Http\Request;
 use App\Services\GoogleCalendarService;
 
@@ -14,12 +14,6 @@ class CalendarController extends Controller{
     {
         $this->calendarService = $calendarService;
     }
-
-    private function getWhatsAppNumber(){
-        $contact = contact::latest()->get(); // Ambil data contact pertama
-            return $contact->no_telp; // Fallback nomor default
-    }
-
 
      public function getEvents(Request $request)
     {
@@ -44,7 +38,7 @@ class CalendarController extends Controller{
             $calendarId = 'aa81d34788905de369f3fa9ecf55d216fdf18ddd069e868b4372ebeb359d2858@group.calendar.google.com';
 
             // Ambil events langsung dari Google Calendar
-            $service = new \Google\Service\Calendar($this->calendarService->getClient());
+            $service = new Calendar($this->calendarService->getClient());
         
             $optParams = [
                 'timeMin' => $start->toIso8601String(),
@@ -100,67 +94,6 @@ class CalendarController extends Controller{
         }
     }
 
-    // public function getEvents(Request $request)
-    // {
-    //     \Log::info('=== CALENDAR EVENTS REQUEST START ===');
-    //     \Log::info('Request params:', $request->all());
-
-    //     try {
-    //         $request->validate([
-    //             'start' => 'required|date',
-    //             'end' => 'required|date',
-    //        ]);
-
-    //         $start = Carbon::parse($request->start);
-    //         $end = Carbon::parse($request->end);
-
-    //         // Batasi range
-    //         $dateRangeInDays = $start->diffInDays($end);
-    //         if ($dateRangeInDays > 30) {
-    //             $end = $start->copy()->addDays(31);
-    //         }
-
-    //         $calendarId = 'aa81d34788905de369f3fa9ecf55d216fdf18ddd069e868b4372ebeb359d2858@group.calendar.google.com';
-
-    //         $timeMin = $start->toIso8601String();
-    //         $timeMax = $end->toIso8601String();
-
-    //         $response = $this->calendarService->getFreeBusy($calendarId, $timeMin, $timeMax);
-    //         $calendars = $response->getCalendars();
-        
-    //         $events = [];
-        
-    //         if (isset($calendars[$calendarId])) {
-    //             $busySlots = $calendars[$calendarId]->getBusy() ?? [];
-            
-    //             foreach ($busySlots as $index => $slot) {
-    //                 $events[] = [
-    //                     'id' => 'busy-' . $index,
-    //                     'title' => '🟥 SIBUK',
-    //                     'start' => $slot->getStart(),
-    //                     'end' => $slot->getEnd(),
-    //                     'color' => '#ff4444', // Merah
-    //                     'textColor' => '#ffffff',
-    //                     'borderColor' => '#cc0000',
-    //                     // HAPUS display: 'background' agar muncul di semua view
-    //                 ];
-    //             }
-    //         }
-
-    //         \Log::info('Returning events', ['events_count' => count($events)]);
-    //         return response()->json($events);
-
-    //     } catch (\Exception $e) {
-    //         \Log::error('Calendar Events Error', [
-    //             'error' => $e->getMessage()
-    //         ]);
-        
-    //         return response()->json([
-    //             'error' => 'Server error: ' . $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
-
     public function getEventDetails(Request $request)
     {
         $request->validate([
@@ -171,8 +104,7 @@ class CalendarController extends Controller{
         $calendarId = 'aa81d34788905de369f3fa9ecf55d216fdf18ddd069e868b4372ebeb359d2858@group.calendar.google.com';
 
         try {
-            // Use Google Calendar API to get actual event details
-            $service = new \Google\Service\Calendar($this->calendarService->getClient());
+            $service = new Calendar($this->calendarService->getClient());
         
             $optParams = array(
                 'timeMin' => $request->start,
@@ -201,7 +133,7 @@ class CalendarController extends Controller{
                     'start' => $start,
                     'end' => $end,
                     'description' => $event->getDescription(),
-                    'location' => $event->getLocation(),  // <- Data lokasi sudah ada di sini
+                    'location' => $event->getLocation(),  // Data lokasi sudah ada di sini
                 ];
             }
 

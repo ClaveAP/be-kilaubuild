@@ -169,27 +169,27 @@
             font-size: 14px;
         }
         
-        .whatsapp-link {
-            color: #25D366;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 8px;
+        .detail-btn {
+            padding: 6px 12px;
+            background: #4285f4;
+            color: white;
+            border: none;
             border-radius: 4px;
-            background-color: rgba(37, 211, 102, 0.1);
+            cursor: pointer;
+            font-size: 12px;
             transition: background-color 0.2s;
         }
-        
-        .whatsapp-link:hover {
-            background-color: rgba(37, 211, 102, 0.2);
-            text-decoration: none;
-            color: #128C7E;
+
+        .detail-btn:hover {
+            background: #3367d6;
         }
-        
-        .whatsapp-icon {
-            font-size: 16px;
+
+        .schedule-table td {
+            vertical-align: middle;
+        }
+
+        .schedule-table th:nth-child(4) {
+            width: 100px; /* Lebar kolom aksi */
         }
 
         /* Responsive */

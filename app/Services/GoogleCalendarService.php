@@ -5,6 +5,8 @@ namespace App\Services;
 use Google\Client;
 use Google\Service\Calendar;
 use Illuminate\Support\Facades\Log;
+use Google\Service\Calendar\FreeBusyRequest;
+use Google\Service\Calendar\FreeBusyRequestItem;
 
 class GoogleCalendarService{
     protected $client;
@@ -12,8 +14,8 @@ class GoogleCalendarService{
     public function __construct(){
         $this->client = new Client();
         
-        // GANTI dengan path file service account Anda
-        $this->client->setAuthConfig(storage_path('app/service-account-key.json'));
+        // path file service account
+        $this->client->setAuthConfig(storage_path('app/kilau-service-account-key.json'));
         $this->client->addScope(Calendar::CALENDAR_READONLY);
         
         // Untuk development, non-aktifkan SSL verification
@@ -26,17 +28,16 @@ class GoogleCalendarService{
     
     public function getFreeBusy($calendarId, $timeMin, $timeMax, $timeZone = 'Asia/Jakarta'){
         try {
-            // Suppress output buffer untuk mencegah output dari Google library
             ob_start();
             
             $service = new Calendar($this->client);
 
-            $request = new \Google\Service\Calendar\FreeBusyRequest();
+            $request = new FreeBusyRequest();
             $request->setTimeMin($timeMin);
             $request->setTimeMax($timeMax);
             $request->setTimeZone($timeZone);
             
-            $item = new \Google\Service\Calendar\FreeBusyRequestItem();
+            $item = new FreeBusyRequestItem();
             $item->setId($calendarId);
             $request->setItems([$item]);
 

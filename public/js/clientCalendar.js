@@ -1,4 +1,3 @@
-// public/js/calendar.js
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('clientCalendar');
     var scheduleContent = document.getElementById('scheduleContent');
@@ -20,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
         displayEventTime: false,
         
         // Sumber data events - mengambil dari endpoint Laravel (free/busy)
-        events: function(fetchInfo, successCallback, failureCallback) {
+        events: function(fetchInfo, successCallback) {
             console.log('🔍 Fetching busy slots for:', fetchInfo.startStr, 'to', fetchInfo.endStr);
             
             const loadingEl = document.getElementById('loading');
@@ -34,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
                     
-                    // MODIFIKASI: Filter hanya event di tanggal mendatang
+                    // filter hanya event di tanggal mendatang
                     const futureEvents = data.filter(event => {
                         const eventStart = new Date(event.start);
                         return eventStart >= today;
@@ -43,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Ubah semua event menjadi "SIBUK" tanpa detail
                     const busyEvents = futureEvents.map(event => ({
                         id: event.id,
-                        title: '🟥 SIBUK',
+                        title: '🟥 Ada Jadwal',
                         start: event.start,
                         end: event.end,
                         allDay: event.allDay,
@@ -72,13 +71,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            // 1. Cek apakah tanggal yang diklik adalah hari ini atau kemarin
+            // Cek apakah tanggal yang diklik adalah hari ini atau kemarin
             if (clickedDate <= today) {
                 alert('Maaf, hanya tanggal besok dan seterusnya yang dapat dipilih.');
                 return;
             }
             
-            // 2. Cek apakah tanggal tersebut memiliki event sibuk
+            // Cek apakah tanggal tersebut memiliki event sibuk
             const clickedDateStr = clickedDate.toISOString().split('T')[0];
             const hasBusyEvent = clientCalendar.getEvents().some(event => {
                 const eventStart = new Date(event.start);
@@ -92,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // 3. Jika lolos kedua pengecekan, buka WhatsApp
+            // Jika lolos kedua pengecekan, buka WhatsApp
             const options = { 
                 weekday: 'long', 
                 year: 'numeric', 
