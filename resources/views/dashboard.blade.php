@@ -277,6 +277,10 @@
             <input name="title" type="text" placeholder="title post">
             <textarea name="instagram_url" type="text" placeholder="instagram url..."></textarea>
             <input type="file" name="image">
+            <label>
+                <input type="checkbox" name="is_published" value="1" checked>
+                Tampilkan langsung di Home Page
+            </label>
             <button>Create post</button>
         </form>
     </div>
@@ -288,6 +292,10 @@
             <input name="name" type="text" placeholder="Nama Layanan...">
             <textarea name="desc" type="text" placeholder="Deskripsi Layanan..."></textarea>
             <input type="file" name="image">
+            <label>
+                <input type="checkbox" name="is_published" value="1" checked>
+                Tampilkan langsung di Home Page
+            </label>
             <button>Create Service</button>
         </form>
     </div>
@@ -420,8 +428,29 @@
                 <h3>{{$post['title']}}</h3>
                 <img src="{{ asset('storage/' . $post->image) }}" alt="{{$post['title']}}" style="max-width: 200px;">
             </a>
+            <div style="margin: 10px 0;">
+                <strong>Status:</strong> 
+                @if($post->di_homepage)
+                    Ditampilkan di Home
+                @else
+                    Tidak ditampilkan di Home
+                @endif
+            </div>
         </div>
-        <p><a href="/edit-post/{{$post->id}}">Edit</a></p>
+        <p>
+            <a href="/edit-post/{{$post->id}}">Edit</a>
+            <form action="/toggle-home-post/{{$post->id}}" method="POST" style="display: inline;">
+                @csrf
+                @method('PATCH')
+                <button type="submit">
+                    @if($post->di_homepage)
+                        Jangan tampilkan pada homepage
+                    @else
+                        Tampilkan pada homepage
+                    @endif
+                </button>
+            </form>
+        </p>
         <form action="/delete-post/{{$post->id}}" method="POST">
             @csrf
             @method('DELETE')

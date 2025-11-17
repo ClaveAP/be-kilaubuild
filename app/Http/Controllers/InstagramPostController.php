@@ -24,6 +24,8 @@ class InstagramPostController extends Controller
             $incomingFields['title'] = strip_tags($incomingFields['title']);
             $incomingFields['instagram_url'] = filter_var($incomingFields['instagram_url']);
             $incomingFields['user_id'] = auth()->id();
+            $incomingFields['is_published'] = $request->has('di_homepage');
+            
             InstagramPost::create($incomingFields);
             return Redirect("/dashboard");
         }
@@ -54,6 +56,7 @@ class InstagramPostController extends Controller
 
             $incomingFields['title'] = strip_tags($incomingFields['title']);
             $incomingFields['instagram_url'] = strip_tags($incomingFields['instagram_url']);
+            $incomingFields['is_published'] = $request->has('di_homepage');
 
             $post->update($incomingFields);
             
@@ -67,6 +70,16 @@ class InstagramPostController extends Controller
         if (auth()->id() == $post['user_id']){
             $post->delete();
             Storage::disk('public')->delete($post->image);
+        }
+        
+        return redirect('/dashboard');
+    }
+
+    public function viewToHome(InstagramPost $post){
+        if (auth()->id() == $post['user_id']){
+            $post->update([
+                'di_homepage' => !$post->di_homepage
+            ]);
         }
         
         return redirect('/dashboard');

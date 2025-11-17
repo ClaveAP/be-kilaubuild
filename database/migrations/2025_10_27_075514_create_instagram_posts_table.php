@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->longText('instagram_url');
             $table->string('image');
+            $table->boolean('di_homepage')->default(false);
             $table->foreignId('user_id')->constrained();
         });
     }

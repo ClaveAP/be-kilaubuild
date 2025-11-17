@@ -270,10 +270,10 @@
         </form>
     </div>
 
-    @if(isset($posts) && $posts->count() > 0)
+    @if(isset($posts) && $posts->where('di_homepage', true)->count() > 0)
     <div style="border: 3px solid black; margin-bottom: 10px;">
         <h2>Posts</h2>
-        @foreach ($posts as $post)
+        @foreach ($posts->where('di_homepage', true) as $post)
         <div style="background-color: gray; padding: 10px; margin: 10px;">
             <a href="{{$post['instagram_url']}}">
                 <h3>{{$post['title']}}</h3>

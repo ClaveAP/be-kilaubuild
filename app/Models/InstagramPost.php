@@ -14,10 +14,7 @@ class InstagramPost extends Model
         'title',
         'instagram_url',
         'image',
+        'di_homepage',
         'user_id'
     ];
-
-    public function searchAuthor(){
-        return $this->belongsTo(User::class, 'user_id');
-    }
 }

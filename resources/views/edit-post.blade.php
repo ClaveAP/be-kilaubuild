@@ -9,9 +9,13 @@
     <form action="/edit-post/{{$post->id}}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
-        <input type="text" name="title" value="{{$post->title}}">
-        <input type="text" name="instagram_url" value="{{$post->instagram_url}}">
-        <input type="file" name="image" value="{{$post->image}}">
+        <input type="text" name="title" value="{{$post->title}}"><br><br>
+        <input type="text" name="instagram_url" value="{{$post->instagram_url}}"><br><br>
+        <input type="file" name="image"><br><br>
+        <label>
+            <input type="checkbox" name="is_published" value="1" {{ $post->is_published ? 'checked' : '' }}>
+            Tampilkan di Home Page
+        </label><br><br>
         <button>Save Changes</button>
     </form>
 </body>

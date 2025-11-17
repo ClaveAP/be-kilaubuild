@@ -83,6 +83,7 @@ Route::post('/create-post', [InstagramPostController::class, 'createPost']);
 Route::get('/edit-post/{post}', [InstagramPostController::class, 'showEditScreen']);
 Route::put('/edit-post/{post}', [InstagramPostController::class, 'updatePost']);
 Route::delete('/delete-post/{post}', [InstagramPostController::class, 'deletePost']);
+Route::patch('/toggle-home-post/{post}', [InstagramPostController::class, 'viewToHome']);
 
 // Services
 Route::post('/create-service', [ServiceController::class, 'createService']);
