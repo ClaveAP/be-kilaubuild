@@ -7,65 +7,77 @@ use Illuminate\Http\Request;
 
 class StatisticController extends Controller
 {
-    public function createStatistic(Request $request){
-        if (auth()->check()){   
-            $incomingFields = $request->validate([
-                'tahun_pengalaman' => 'required',
-                'proyek_selesai' => 'required',
-                'klien_puas' => 'required',
-                'sebaran_kota' => 'required'
-            ]);
+    public function index(){
+        $statis = statistic::all();
 
-            $incomingFields['tahun_pengalaman'] = strip_tags($incomingFields['tahun_pengalaman']);
-            $incomingFields['proyek_selesai'] = strip_tags($incomingFields['proyek_selesai']);
-            $incomingFields['klien_puas'] = strip_tags($incomingFields['klien_puas']);
-            $incomingFields['sebaran_kota'] = strip_tags($incomingFields['sebaran_kota']);
-            $incomingFields['user_id'] = auth()->id();
-            statistic::create($incomingFields);
-            return Redirect("/dashboard");
+        return response()->json([
+            'success' => true,
+            'data' => $statis
+        ], 200);
+    }
+    
+    public function store(Request $request){
+        if (!auth()->check()){
+             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }   
+
+        $incomingFields = $request->validate([
+            'tahun_pengalaman' => 'required',
+            'proyek_selesai' => 'required',
+            'klien_puas' => 'required',
+            'sebaran_kota' => 'required'
+        ]);
+
+        // Sanitasi
+        foreach($incomingFields as $key => $value) {
+            $incomingFields[$key] = strip_tags($value);
         }
         
-        return redirect('/');  
+        $incomingFields['user_id'] = auth()->id();
+        $statis = statistic::create($incomingFields);
+        
+        return response()->json([
+            'success' => true,
+            'message' => "Statistik berhasil dibuat",
+            'data' => $statis
+        ], 201);
     }
 
-    public function showEditScreen(statistic $statis){
-        if (auth()->id() == $statis['user_id']){
-            return view('edit-statistic', ['statis' => $statis]);
+    public function update(statistic $statis, Request $request){
+        if (auth()->id() !== $statis->user_id){
+            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
         }
+
+        $incomingFields = $request->validate([
+            'tahun_pengalaman' => 'required',
+            'proyek_selesai' => 'required',
+            'klien_puas' => 'required',
+            'sebaran_kota' => 'required'
+        ]);
+
+        foreach($incomingFields as $key => $value) {
+            $incomingFields[$key] = strip_tags($value);
+        }
+
+        $statis->update($incomingFields);
         
-        return redirect('/');
+        return response()->json([
+            'success' => true,
+            'message' => "Statistik berhasil diperbarui",
+            'data' => $statis
+        ], 200);
     }
 
-    public function updateStatistic(statistic $statis, Request $request){
-        if (auth()->id() == $statis['user_id']){
-            $incomingFields = $request->validate([
-                'tahun_pengalaman' => 'required',
-                'proyek_selesai' => 'required',
-                'klien_puas' => 'required',
-                'sebaran_kota' => 'required'
-            ]);
-
-
-            $incomingFields['tahun_pengalaman'] = strip_tags($incomingFields['tahun_pengalaman']);
-            $incomingFields['proyek_selesai'] = strip_tags($incomingFields['proyek_selesai']);
-            $incomingFields['klien_puas'] = strip_tags($incomingFields['klien_puas']);
-            $incomingFields['sebaran_kota'] = strip_tags($incomingFields['sebaran_kota']);
-
-            $statis->update($incomingFields);
-            
-            return redirect('/dashboard');
+    public function destroy(statistic $statis){
+        if (auth()->id() !== $statis->user_id){
+            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
         }
         
-        return redirect('/');
-    }
-
-    public function deleteStatistic(statistic $statis){
-        if (auth()->id() == $statis['user_id']){
-            $statis->delete();
-            
-            return redirect('/dashboard');
-        }
+        $statis->delete();
         
-        return redirect('/');
+        return response()->json([
+            'success' => true,
+            'message' => "Statistik berhasil dihapus"
+        ], 200);
     }
 }

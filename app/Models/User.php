@@ -2,42 +2,26 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -46,47 +30,37 @@ class User extends Authenticatable
         ];
     }
 
+    // Relasi ke Tabel Lain
     public function adminPost(){
-        $this->hasMany(InstagramPost::class, 'user_id');
-    }
-
-    public function adminServices() {
-        $this->hasMany(service::class, 'user_id');
+        return $this->hasMany(InstagramPost::class, 'user_id');
     }
 
     public function adminFaqs() {
-        $this->hasMany(Faq::class, 'user_id');
+        return $this->hasMany(Faq::class, 'user_id');
     }
 
     public function adminPD() {
-        $this->hasMany(projectDone::class, 'user_id');
+        return $this->hasMany(projectDone::class, 'user_id');
     }
 
     public function adminOP() {
-        $this->hasMany(ongoingProjects::class, 'user_id');
+        return $this->hasMany(ongoingProjects::class, 'user_id');
     }
 
     public function adminDI() {
-        $this->hasMany(desainInterior::class, 'user_id');
+        return $this->hasMany(desainInterior::class, 'user_id');
     }
 
     public function adminTstmn() {
-        $this->hasMany(testimony::class, 'user_id');
+        return $this->hasMany(testimoni::class, 'user_id');
     }
 
     public function adminStatistic() {
-        $this->hasMany(statistic::class, 'user_id');
+        return $this->hasMany(statistic::class, 'user_id');
     }
 
     public function adminContact() {
-        $this->hasMany(contact::class, 'user_id');
+        return $this->hasMany(contact::class, 'user_id');
     }
-
-    public function adminOws() {
-        $this->hasMany(ownerProfile::class, 'user_id');
-    }
-
-    public function adminVisiMisi() {
-        $this->hasMany(visionMission::class, 'user_id');
-    }
+    
 }

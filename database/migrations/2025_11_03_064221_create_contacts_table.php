@@ -15,15 +15,9 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('no_telp');
-            $table->string('alamat');
-            $table->string('link_gmaps');
+            $table->text('alamat');
+            $table->text('link_gmaps');
             $table->string('email');
-            $table->string('url_instagram')->nullable();
-            $table->string('url_facebook')->nullable();
-            $table->string('url_threads')->nullable();
-            $table->string('url_tiktok')->nullable();
-            $table->string('url_youtube')->nullable();
-            $table->string('url_twitter')->nullable();
             $table->string('user_id');
         });
     }

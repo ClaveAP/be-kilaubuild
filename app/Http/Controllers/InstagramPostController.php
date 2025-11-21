@@ -9,82 +9,92 @@ use App\Http\Controllers\ImageController;
 
 class InstagramPostController extends Controller
 {
-    public function createPost(Request $request){
-        if (auth()->check()){       
-            $incomingFields = $request->validate([
-                'title' => 'required',
-                'instagram_url' => 'required',
-                'image' => 'required'
-            ]);
+    public function index(){
+        $posts = InstagramPost::latest()->get();
 
-            if($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('instagram_posts', 'public');
-                ImageController::compressImage($imagePath);
-                $incomingFields['image'] = $imagePath;
-            }
+        return response()->json([
+            'success' => true,
+            'data' => $posts
+        ], 200);
+    }
+    
+    public function store(Request $request){
+        if (!auth()->check()){
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }       
 
-            $incomingFields['title'] = strip_tags($incomingFields['title']);
-            $incomingFields['instagram_url'] = filter_var($incomingFields['instagram_url']);
-            $incomingFields['user_id'] = auth()->id();
-            $incomingFields['di_homepage'] = $request->has('di_homepage');
-            
-            InstagramPost::create($incomingFields);
-            return Redirect("/dashboard");
+        $incomingFields = $request->validate([
+            'title' => 'required',
+            'instagram_url' => 'required|url',
+            'image' => 'required|image'
+        ]);
+
+        if($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('instagram_posts', 'public');
+            ImageController::compressImage($imagePath);
+            $incomingFields['image'] = $imagePath;
         }
+
+        $incomingFields['title'] = strip_tags($incomingFields['title']);
         
-        return redirect('/');
+        $incomingFields['instagram_url'] = strip_tags($incomingFields['instagram_url']); 
+        $incomingFields['user_id'] = auth()->id();
+        
+        $post = InstagramPost::create($incomingFields);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Post berhasil dibuat',
+            'data' => $post
+        ], 201);
     }
 
-    public function showEditScreen(InstagramPost $post){
-        if (auth()->id() == $post['user_id']){
-            return view('edit-post', ['post' => $post]);
+    public function update(InstagramPost $post, Request $request){
+        if (auth()->id() !== $post->user_id){
+             return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
         }
+
+        $incomingFields = $request->validate([
+            'title' => 'required',
+            'instagram_url' => 'required|url',
+            'image' => 'sometimes|image|nullable'
+        ]);
+
+        if($request->hasFile('image')) {
+            if($post->image) Storage::disk('public')->delete($post->image);
+            $imagePath = $request->file('image')->store('instagram_posts', 'public');
+            ImageController::compressImage($imagePath);
+            $incomingFields['image'] = $imagePath;
+        }
+
+        $incomingFields['title'] = strip_tags($incomingFields['title']);
+        $incomingFields['instagram_url'] = strip_tags($incomingFields['instagram_url']);
         
-        return redirect('/');
+       
+        if($request->has('di_homepage')){
+            $incomingFields['di_homepage'] = true; 
+        }
+
+        $post->update($incomingFields);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Post berhasil diperbarui',
+            'data' => $post
+        ], 200);
     }
 
-    public function updatePost(InstagramPost $post, Request $request){
-        if (auth()->id() == $post['user_id']){
-            $incomingFields = $request->validate([
-                'title' => 'required',
-                'instagram_url' => 'required'
-            ]);
-
-            if($request->hasFile('image')) {
-                Storage::disk('public')->delete($post->image);
-                $imagePath = $request->file('image')->store('instagram_posts', 'public');
-                ImageController::compressImage($imagePath);
-                $incomingFields['image'] = $imagePath;
-            }
-
-            $incomingFields['title'] = strip_tags($incomingFields['title']);
-            $incomingFields['instagram_url'] = strip_tags($incomingFields['instagram_url']);
-            $incomingFields['di_homepage'] = $request->has('di_homepage');
-
-            $post->update($incomingFields);
-            
-            return redirect('/dashboard');
+    public function destroy(InstagramPost $post){
+        if (auth()->id() !== $post->user_id){
+             return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
         }
-        
-        return redirect('/');
-    }
 
-    public function deletePost(InstagramPost $post){
-        if (auth()->id() == $post['user_id']){
-            $post->delete();
-            Storage::disk('public')->delete($post->image);
-        }
-        
-        return redirect('/dashboard');
-    }
-
-    public function viewToHome(InstagramPost $post){
-        if (auth()->id() == $post['user_id']){
-            $post->update([
-                'di_homepage' => !$post->di_homepage
-            ]);
-        }
-        
-        return redirect('/dashboard');
+        if($post->image) Storage::disk('public')->delete($post->image);
+        $post->delete();
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'Post berhasil dihapus',
+        ], 200);
     }
 }

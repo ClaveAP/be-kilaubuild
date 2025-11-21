@@ -10,7 +10,7 @@ class FeedbackController extends Controller
     public function sendFeedback(Request $request){
         $incomingFields = $request->validate([
             'name' => 'required',
-            'email' => 'required',
+            'email' => 'required|email',
             'no_telp' => 'nullable',
             'feedback' => 'required'
         ]);
@@ -19,7 +19,13 @@ class FeedbackController extends Controller
         $incomingFields['email'] = strip_tags($incomingFields['email']);
         $incomingFields['no_telp'] = strip_tags($incomingFields['no_telp']);
         $incomingFields['feedback'] = strip_tags($incomingFields['feedback']);
-        feedback::create($incomingFields);
-        return redirect('/');
+        
+        $data = feedback::create($incomingFields);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Feedback berhasil dikirim',
+            'data' => $data
+        ], 201);
     }
 }

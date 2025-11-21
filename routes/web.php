@@ -15,28 +15,21 @@ use App\Models\ongoingProjects;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\BenefitController;
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\FeedbackController;
-use App\Http\Controllers\VisiMisiController;
 use App\Http\Controllers\StatisticController;
-use App\Http\Controllers\TestimonyController;
+use App\Http\Controllers\TestimoniController;
 use App\Http\Controllers\ProjectDoneController;
-use App\Http\Controllers\OwnerProfileController;
 use App\Http\Controllers\InstagramPostController;
 use App\Http\Controllers\DesainInteriorController;
 use App\Http\Controllers\OngoingProjectController;
+use App\Models\testimoni;
 
 Route::get('/', function () {
     $posts = InstagramPost::all();
     return view('home', ['posts' => $posts]);
 });
 
-Route::get('/calendar/events', [CalendarController::class, 'getEvents'])->name('calendar.events');
-Route::get('/calendar/event-details', [CalendarController::class, 'getEventDetails'])->name('calendar.event-details');
-Route::get('/contact', [CalendarController::class, 'index']);
 Route::get('/contact/phone', function () {
     $contact = contact::first(); // Ambil baris pertama (atau sesuaikan query)
     return response()->json(['no_telp' => $contact->no_telp]);
@@ -46,7 +39,7 @@ Route::get('/dashboard', function () {
     $posts = InstagramPost::latest()->get();
     $srvcs = service::latest()->get();
     $faqs = Faq::latest()->get();
-    $tstmns = testimony::latest()->get();
+    $tstmns = testimoni::latest()->get();
     $PDs = projectDone::latest()->get();
     $OPs = ongoingProjects::latest()->get();
     $DIs = desainInterior::latest()->get();
@@ -85,12 +78,6 @@ Route::put('/edit-post/{post}', [InstagramPostController::class, 'updatePost']);
 Route::delete('/delete-post/{post}', [InstagramPostController::class, 'deletePost']);
 Route::patch('/toggle-home-post/{post}', [InstagramPostController::class, 'viewToHome']);
 
-// Services
-Route::post('/create-service', [ServiceController::class, 'createService']);
-Route::get('/edit-service/{srvc}', [ServiceController::class, 'showEditScreen']);
-Route::put('/edit-service/{srvc}', [ServiceController::class, 'updateService']);
-Route::delete('/delete-service/{srvc}', [ServiceController::class, 'deleteService']);
-
 // Statistic
 Route::post('/create-statistic', [StatisticController::class, 'createStatistic']);
 Route::get('/edit-statistic/{statis}', [StatisticController::class, 'showEditScreen']);
@@ -106,15 +93,14 @@ Route::delete('/delete-statistic/{statis}', [StatisticController::class, 'delete
 // [DELETE] 200 be.facebook.com/api/faq/1
 Route::get('/faq', [FaqController::class, 'index']);
 Route::post('/faq', [FaqController::class, 'store']);
-Route::get('/edit-faq/{faq}', [FaqController::class, 'showEditScreen']);
-Route::put('/edit-faq/{faq}', [FaqController::class, 'updateFAQ']);
-Route::delete('/delete-faq/{faq}', [FaqController::class, 'deleteFAQ']);
+Route::put('/faq/{faq}', [FaqController::class, 'update']);
+Route::delete('/faq/{faq}', [FaqController::class, 'destroy']);
 
-// Testimonys
-Route::post('/create-testimony', [TestimonyController::class, 'createTstmn']);
-Route::get('/edit-testimony/{tstmn}', [TestimonyController::class, 'showEditScreen']);
-Route::put('/edit-testimony/{tstmn}', [TestimonyController::class, 'updateTstmn']);
-Route::delete('/delete-testimony/{tstmn}', [TestimonyController::class, 'deleteTstmn']);
+// Testimoni
+Route::post('/create-testimoni', [TestimoniController::class, 'createTstmn']);
+Route::get('/edit-testimoni/{tstmn}', [TestimoniController::class, 'showEditScreen']);
+Route::put('/edit-testimoni/{tstmn}', [TestimoniController::class, 'updateTstmn']);
+Route::delete('/delete-testimoni/{tstmn}', [TestimoniController::class, 'deleteTstmn']);
 
 // Ongoing Project
 Route::post('/create-ongoing-project', [OngoingProjectController::class, 'createOP']);
@@ -129,31 +115,13 @@ Route::put('/edit-project-done/{PD}', [ProjectDoneController::class, 'updatePD']
 Route::delete('/delete-project-done/{PD}', [ProjectDoneController::class, 'deletePD']);
 
 // Desain Interior
-Route::post('/create-desain-interior', [DesainInteriorController::class, 'createDI']);
-Route::get('/edit-desain-interior/{DI}', [DesainInteriorController::class, 'showEditScreen']);
-Route::put('/edit-desain-interior/{DI}', [DesainInteriorController::class, 'updateDI']);
-Route::delete('/delete-desain-interior/{DI}', [DesainInteriorController::class, 'deleteDI']);
+Route::post('desain-interior', [DesainInteriorController::class, 'index']);
+Route::get('/desain-interior/{DI}', [DesainInteriorController::class, 'store']);
+Route::put('/desain-interior/{DI}', [DesainInteriorController::class, 'update']);
+Route::delete('/delete-desain-interior/{DI}', [DesainInteriorController::class, 'destroy']);
 
 // Contact
 Route::post('/create-contact', [ContactController::class, 'createContact']);
 Route::get('/edit-contact/{cont}', [ContactController::class, 'showEditScreen']);
 Route::put('/edit-contact/{cont}', [ContactController::class, 'updateContact']);
 Route::delete('/delete-contact/{cont}', [ContactController::class, 'deleteContact']);
-
-// Owner Profile
-Route::post('/create-owner-profile', [OwnerProfileController::class, 'createOwp']);
-Route::get('/edit-owner-profile/{owp}', [OwnerProfileController::class, 'showEditScreen']);
-Route::put('/edit-owner-profile/{owp}', [OwnerProfileController::class, 'updateOwp']);
-Route::delete('/delete-owner-profile/{owp}', [OwnerProfileController::class, 'deleteOwp']);
-
-// Visi Misi
-Route::post('/create-visi-misi', [VisiMisiController::class, 'createVisiMisi']);
-Route::get('/edit-visi-misi/{VM}', [VisiMisiController::class, 'showEditScreen']);
-Route::put('/edit-visi-misi/{VM}', [VisiMisiController::class, 'updateVisiMisi']);
-Route::delete('/delete-visi-misi/{VM}', [VisiMisiController::class, 'deleteVisiMisi']);
-
-// Keunggulan
-Route::post('/create-benefit', [BenefitController::class, 'createBenefit']);
-Route::get('/edit-benefit/{bnft}', [BenefitController::class, 'showEditScreen']);
-Route::put('/edit-benefit/{bnft}', [BenefitController::class, 'updateBenefit']);
-Route::delete('/delete-benefit/{bnft}', [BenefitController::class, 'deleteBenefit']);

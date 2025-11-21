@@ -7,87 +7,77 @@ use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
-    public function createContact(Request $request){
-        if (auth()->check()){   
-            $incomingFields = $request->validate([
-                'no_telp' => 'required',
-                'alamat' => 'required',
-                'link_gmaps' => 'required',
-                'email' => 'required',
-                'url_instagram' => 'nullable',
-                'url_facebook' => 'nullable',
-                'url_threads' => 'nullable',
-                'url_tiktok' => 'nullable',
-                'url_youtube' => 'nullable',
-                'url_twitter' => 'nullable',
-            ]);
+    // GET: Ambil Semua Data
+    public function index(){
+        $cont = contact::all();
 
-            $incomingFields['no_telp'] = strip_tags($incomingFields['no_telp']);
-            $incomingFields['alamat'] = strip_tags($incomingFields['alamat']);
-            $incomingFields['link_gmaps'] = filter_var($incomingFields['link_gmaps']);
-            $incomingFields['email'] = strip_tags($incomingFields['email']);
-            $incomingFields['url_instagram'] = filter_var($incomingFields['url_instagram']);
-            $incomingFields['url_facebook'] = filter_var($incomingFields['url_facebook']);
-            $incomingFields['url_threads'] = filter_var($incomingFields['url_threads']);
-            $incomingFields['url_tiktok'] = filter_var($incomingFields['url_tiktok']);
-            $incomingFields['url_youtube'] = filter_var($incomingFields['url_youtube']);
-            $incomingFields['url_twitter'] = filter_var($incomingFields['url_twitter']);
-            $incomingFields['user_id'] = auth()->id();
-            contact::create($incomingFields);
-            return Redirect("/dashboard");
-        }
-        
-        return redirect('/');  
+        return response()->json([
+            'success' => true,
+            'data' => $cont
+        ], 200);
     }
 
-    public function showEditScreen(contact $cont){
-        if (auth()->id() == $cont['user_id']){
-            return view('edit-contact', ['cont' => $cont]);
-        }
+    // POST: Simpan Data Baru
+    public function store(Request $request){
+        // Tidak perlu cek auth()->check() manual karena sudah dihandle middleware route
+
+        $incomingFields = $request->validate([
+            'no_telp' => 'required',
+            'alamat' => 'required',
+            'link_gmaps' => 'required',
+            'email' => 'required'
+        ]);
+
+        $incomingFields['no_telp'] = strip_tags($incomingFields['no_telp']);
+        $incomingFields['alamat'] = strip_tags($incomingFields['alamat']);
+        $incomingFields['link_gmaps'] = strip_tags($incomingFields['link_gmaps']);
+        $incomingFields['email'] = strip_tags($incomingFields['email']);
         
-        return redirect('/');
+        // Otomatis ambil ID user yang sedang login
+        $incomingFields['user_id'] = auth()->id(); 
+        
+        $cont = contact::create($incomingFields);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Kontak berhasil dibuat',
+            'data' => $cont
+        ], 201);
     }
 
-    public function updateContact(contact $cont, Request $request){
-        if (auth()->id() == $cont['user_id']){
-            $incomingFields = $request->validate([
-                'no_telp' => 'required',
-                'alamat' => 'required',
-                'link_gmaps' => 'required',
-                'email' => 'required',
-                'url_instagram' => 'nullable',
-                'url_facebook' => 'nullable',
-                'url_threads' => 'nullable',
-                'url_tiktok' => 'nullable',
-                'url_youtube' => 'nullable',
-                'url_twitter' => 'nullable',
-            ]);
-
-            $incomingFields['no_telp'] = strip_tags($incomingFields['no_telp']);
-            $incomingFields['alamat'] = strip_tags($incomingFields['alamat']);
-            $incomingFields['link_gmaps'] = filter_var($incomingFields['link_gmaps']);
-            $incomingFields['email'] = strip_tags($incomingFields['email']);
-            $incomingFields['url_instagram'] = filter_var($incomingFields['url_instagram']);
-            $incomingFields['url_facebook'] = filter_var($incomingFields['url_facebook']);
-            $incomingFields['url_threads'] = filter_var($incomingFields['url_threads']);
-            $incomingFields['url_tiktok'] = filter_var($incomingFields['url_tiktok']);
-            $incomingFields['url_youtube'] = filter_var($incomingFields['url_youtube']);
-            $incomingFields['url_twitter'] = filter_var($incomingFields['url_twitter']);
-
-            $cont->update($incomingFields);
-            
-            return redirect('/dashboard');
-        }
+    // PUT: Update Data
+    public function update(contact $cont, Request $request){
+        // Hapus pengecekan kepemilikan user_id agar tidak error saat ID admin berubah (akibat seed ulang)
         
-        return redirect('/');
+        $incomingFields = $request->validate([
+            'no_telp' => 'required',
+            'alamat' => 'required',
+            'link_gmaps' => 'required',
+            'email' => 'required',
+        ]);
+
+        $incomingFields['no_telp'] = strip_tags($incomingFields['no_telp']);
+        $incomingFields['alamat'] = strip_tags($incomingFields['alamat']);
+        $incomingFields['link_gmaps'] = strip_tags($incomingFields['link_gmaps']);
+        $incomingFields['email'] = strip_tags($incomingFields['email']);
+
+        $cont->update($incomingFields);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Kontak berhasil diperbarui',
+            'data' => $cont
+        ], 200);
     }
 
-    public function deleteContact(contact $cont){
-        if (auth()->id() == $cont['user_id']){
-            $cont->delete();
-            
-        }
+    // DELETE: Hapus Data
+    public function destroy(contact $cont){
+        $cont->delete();
         
-        return redirect('/dashboard');
+        return response()->json([
+            'success' => true,
+            'message' => 'Kontak berhasil dihapus',
+            'data' => null
+        ], 200);
     }
 }

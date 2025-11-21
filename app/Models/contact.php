@@ -14,12 +14,6 @@ class contact extends Model
         'alamat',
         'link_gmaps',
         'email',
-        'url_instagram',
-        'url_facebook',
-        'url_threads',
-        'url_tiktok',
-        'url_youtube',
-        'url_twitter',
         'user_id'
     ];
 }
