@@ -19,7 +19,6 @@ class ContactController extends Controller
 
     // POST: Simpan Data Baru
     public function store(Request $request){
-        // Tidak perlu cek auth()->check() manual karena sudah dihandle middleware route
 
         $incomingFields = $request->validate([
             'no_telp' => 'required',
