@@ -32,12 +32,12 @@ class ContactController extends Controller
         $incomingFields['alamat'] = strip_tags($incomingFields['alamat']);
         $incomingFields['link_gmaps'] = strip_tags($incomingFields['link_gmaps']);
         $incomingFields['email'] = strip_tags($incomingFields['email']);
-        
+
         // Otomatis ambil ID user yang sedang login
-        $incomingFields['user_id'] = auth()->id(); 
-        
+        $incomingFields['user_id'] = auth()->id();
+
         $cont = contact::create($incomingFields);
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Kontak berhasil dibuat',
@@ -47,8 +47,7 @@ class ContactController extends Controller
 
     // PUT: Update Data
     public function update(contact $cont, Request $request){
-        // Hapus pengecekan kepemilikan user_id agar tidak error saat ID admin berubah (akibat seed ulang)
-        
+
         $incomingFields = $request->validate([
             'no_telp' => 'required',
             'alamat' => 'required',
@@ -62,7 +61,7 @@ class ContactController extends Controller
         $incomingFields['email'] = strip_tags($incomingFields['email']);
 
         $cont->update($incomingFields);
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Kontak berhasil diperbarui',
@@ -73,7 +72,7 @@ class ContactController extends Controller
     // DELETE: Hapus Data
     public function destroy(contact $cont){
         $cont->delete();
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Kontak berhasil dihapus',
